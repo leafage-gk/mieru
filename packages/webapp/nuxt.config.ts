@@ -13,15 +13,15 @@ const configuration: Configuration = {
   // css: ['~/assets/styles/app.scss'],
   plugins: ['~/plugins/composition-api'],
   modules: ['nuxt-dayjs-module'],
-  buildModules: [
-    '@nuxtjs/vuetify',
-    '@nuxt/typescript-build',
-  ],
+  buildModules: ['@nuxtjs/vuetify', '@nuxt/typescript-build'],
   build: {
     devtools: true,
   },
   dayjs,
   vuetify,
+  generate: {
+    dir: '../firebase/public',
+  },
 };
 
 export default configuration;
