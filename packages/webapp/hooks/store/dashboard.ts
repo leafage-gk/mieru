@@ -1,9 +1,10 @@
 import { ref } from '@vue/composition-api';
 import * as _uuid from 'uuid';
 
-interface PanelItem {
+export interface PanelItem {
   uuid: string;
   type: 'panel';
+  background?: string;
   flex?: number;
 }
 
@@ -175,12 +176,47 @@ const useDashboard = () => {
     }
     root.value = getContainer(raw.rootId);
   };
+  const setPanel = (uuid: string, panel: PanelItem) => {
+    const oldPanel = items.get(uuid);
+    if (oldPanel && oldPanel.type === 'panel') {
+      items.set(uuid, panel);
+      root.value = getContainer(raw.rootId);
+    }
+  };
+  const removePanel = (uuid: string, ri: number, ci: number) => {
+    const item = items.get(uuid);
+    if (!item || item.type === 'panel') {
+      return;
+    }
+    if (uuid === raw.rootId) {
+      return;
+    }
+    items.delete(item.rows[ri].cols[ci]);
+    item.rows[ri].cols.splice(ci, 1);
+    if (item.rows[ri].cols.length === 0) {
+      item.rows.splice(ri, 1);
+    }
+    if (item.rows.length === 1 && item.rows[0].cols.length === 1) {
+      const panel = items.get(item.rows[0].cols[0]);
+      if (panel) {
+        items.delete(panel.uuid);
+        items.set(uuid, {
+          ...panel,
+          uuid,
+          flex: item.flex,
+        } as ItemRaw);
+      }
+    }
+    root.value = getContainer(raw.rootId);
+  };
   return {
     root,
     divideRow,
     divideCol,
     rowSlider,
     colSlider,
+    setPanel,
+    removePanel,
   };
 };
 

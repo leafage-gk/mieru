@@ -21,10 +21,17 @@
           maxWidth: col.flex ? `${(100 * col.flex) / 12}%` : undefined,
         }"
       >
-        <div :class="{ panel: true, 'pa-1': col.type === 'panel' }">
+        <div
+          :class="{ panel: true, 'pa-1': col.type === 'panel' }"
+          @click="() => touchPanel(col, ri, ci)"
+        >
           <grid-group :item="col" />
           <div
-            v-if="item.type === 'container' && ri < item.rows.length - 1"
+            v-if="
+              item.type === 'container' &&
+              ri < item.rows.length - 1 &&
+              toolType === 'collapse'
+            "
             :class="{ 'slider-row': true, appear: sliderRowAppear }"
             @mouseover="sliderRowShow"
             @mousedown="sliderRowStart"
@@ -33,7 +40,7 @@
             @mouseup="sliderRowEnd"
           />
           <div
-            v-if="ci < row.cols.length - 1"
+            v-if="ci < row.cols.length - 1 && toolType === 'collapse'"
             :class="{ 'slider-col': true, appear: sliderColAppear }"
             @mouseover="sliderColShow"
             @mousedown="sliderColStart"
@@ -45,14 +52,16 @@
       </v-col>
     </v-row>
   </v-container>
-  <div v-else class="divider">
+  <div v-else class="divider" :style="{ background: item.background }">
     <div
+      v-if="toolType === 'cutter'"
       :class="{ 'divide-row': true, appear: divideRowAppear }"
       @click="divideRow"
       @mouseover="divideRowShow"
       @mouseout="divideRowHide"
     />
     <div
+      v-if="toolType === 'cutter'"
       :class="{ 'divide-col': true, appear: divideColAppear }"
       @click="divideCol"
       @mouseover="divideColShow"
@@ -91,7 +100,7 @@ export default defineComponent({
       sliderColAppear: false,
       sliderColAvailable: false,
     });
-    const { dashboard } = injectWithE(storeKey);
+    const { dashboard, tools } = injectWithE(storeKey);
     const divideRow = () => {
       dashboard.divideRow(props.item.uuid);
     };
@@ -151,6 +160,23 @@ export default defineComponent({
         }
       }
     };
+    const touchPanel = (item: ColItem, ri: number, ci: number) => {
+      if (item.type === 'container') {
+        return;
+      }
+      if (tools.type.value === 'fill-color') {
+        const panel = {
+          ...item,
+          background: tools.color.value,
+        };
+        dashboard.setPanel(item.uuid, panel);
+      }
+      if (tools.type.value === 'eraser') {
+        setTimeout(() => {
+          dashboard.removePanel(props.item.uuid, ri, ci);
+        }, 0);
+      }
+    };
     return {
       container,
       divideRow,
@@ -169,6 +195,9 @@ export default defineComponent({
       sliderColHide,
       dragSliderRow,
       dragSliderCol,
+      toolType: tools.type,
+      color: tools.color,
+      touchPanel,
       ...toRefs(state),
     };
   },
