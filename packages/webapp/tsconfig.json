@@ -1,0 +1,21 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "target": "es2018",
+    "module": "esnext",
+    "noEmit": true,
+    "baseUrl": ".",
+    "paths": {
+      "~/*": ["./*"]
+    },
+    "typeRoots": ["../../node_modules/@types"],
+    "types": [
+      "@nuxt/types",
+      "@nuxtjs/vuetify",
+      "@types/node",
+      "@types/uuid",
+      "nuxt-dayjs-module"
+    ]
+  },
+  "exclude": ["node_modules", "dist", ".nuxt"]
+}
