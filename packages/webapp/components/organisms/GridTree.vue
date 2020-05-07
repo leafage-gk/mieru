@@ -22,32 +22,20 @@
         }"
       >
         <div
-          :class="{ panel: true, 'pa-1': col.type === 'panel' }"
+          class="panel"
+          :style="{ padding: col.type === 'panel' ? '4px' : undefined }"
           @click="() => touchPanel(col, ri, ci)"
         >
           <grid-group :item="col" />
           <div
-            v-if="
-              item.type === 'container' &&
-              ri < item.rows.length - 1 &&
-              toolType === 'collapse'
-            "
-            :class="{ 'slider-row': true, appear: sliderRowAppear }"
-            @mouseover="sliderRowShow"
-            @mousedown="sliderRowStart"
-            @mouseout="sliderRowHide"
-            @mousemove="dragSliderRow"
-            @mouseup="sliderRowEnd"
-          />
-          <div
-            v-if="ci < row.cols.length - 1 && toolType === 'collapse'"
-            :class="{ 'slider-col': true, appear: sliderColAppear }"
-            @mouseover="sliderColShow"
-            @mousedown="sliderColStart"
-            @mouseout="sliderColHide"
-            @mousemove="dragSliderCol"
-            @mouseup="sliderColEnd"
-          />
+            v-if="item.type === 'container' && ri < item.rows.length - 1"
+            class="dock-adjust-row"
+          >
+            <dock-adjust @movey="dockAdjustRow" />
+          </div>
+          <div v-if="ci < row.cols.length - 1" class="dock-adjust-col">
+            <dock-adjust vertical @movex="dockAdjustCol" />
+          </div>
         </div>
       </v-col>
     </v-row>
@@ -90,15 +78,14 @@ export default defineComponent({
       required: true,
     },
   },
+  components: {
+    DockAdjust: () => import('~/components/atoms/DockAdjust.vue'),
+  },
   setup(props) {
     const container = ref(null as Element | null);
     const state = reactive({
       divideRowAppear: false,
       divideColAppear: false,
-      sliderRowAppear: false,
-      sliderRowAvailable: false,
-      sliderColAppear: false,
-      sliderColAvailable: false,
     });
     const { dashboard, tools } = injectWithE(storeKey);
     const divideRow = () => {
@@ -119,42 +106,17 @@ export default defineComponent({
     const divideColHide = () => {
       state.divideColAppear = false;
     };
-    const sliderRowShow = () => {
-      state.sliderRowAppear = true;
-    };
-    const sliderRowStart = () => {
-      state.sliderRowAvailable = true;
-    };
-    const sliderRowEnd = () => {
-      state.sliderRowAvailable = false;
-    };
-    const sliderRowHide = () => {
-      state.sliderRowAppear = false;
-      state.sliderRowAvailable = false;
-    };
-    const sliderColShow = () => {
-      state.sliderColAppear = true;
-    };
-    const sliderColStart = () => {
-      state.sliderColAvailable = true;
-    };
-    const sliderColEnd = () => {
-      state.sliderColAvailable = false;
-    };
-    const sliderColHide = () => {
-      state.sliderColAppear = false;
-    };
-    const dragSliderRow = (e: MouseEvent) => {
-      if (container.value && state.sliderRowAvailable) {
-        const flex = (12 * e.movementY) / container.value.clientHeight;
+    const dockAdjustRow = (moveY: number) => {
+      if (container.value) {
+        const flex = (12 * moveY) / container.value.clientHeight;
         if (flex !== 0) {
           dashboard.rowSlider(props.item.uuid, flex);
         }
       }
     };
-    const dragSliderCol = (e: MouseEvent) => {
-      if (container.value && state.sliderColAvailable) {
-        const flex = (12 * e.movementX) / container.value.clientWidth;
+    const dockAdjustCol = (moveX: number) => {
+      if (container.value) {
+        const flex = (12 * moveX) / container.value.clientWidth;
         if (flex !== 0) {
           dashboard.colSlider(props.item.uuid, flex);
         }
@@ -185,16 +147,8 @@ export default defineComponent({
       divideRowHide,
       divideColShow,
       divideColHide,
-      sliderRowShow,
-      sliderRowEnd,
-      sliderRowStart,
-      sliderRowHide,
-      sliderColShow,
-      sliderColStart,
-      sliderColEnd,
-      sliderColHide,
-      dragSliderRow,
-      dragSliderCol,
+      dockAdjustRow,
+      dockAdjustCol,
       toolType: tools.type,
       color: tools.color,
       touchPanel,
@@ -238,44 +192,18 @@ export default defineComponent({
     background: #aaa;
   }
 }
-.slider-row {
+.dock-adjust-row {
   position: absolute;
-  bottom: -19px;
+  bottom: -4px;
   left: 0;
   z-index: 1;
   width: 100%;
-  height: 40px;
-  cursor: pointer;
-  &.appear {
-    &::after {
-      position: absolute;
-      top: 17px;
-      left: 0;
-      width: 100%;
-      height: 8px;
-      content: '';
-      background: #aaa;
-    }
-  }
 }
-.slider-col {
+.dock-adjust-col {
   position: absolute;
   top: 0;
-  right: -19px;
+  right: -4px;
   z-index: 1;
-  width: 40px;
   height: 100%;
-  cursor: pointer;
-  &.appear {
-    &::after {
-      position: absolute;
-      top: 0;
-      left: 17px;
-      width: 8px;
-      height: 100%;
-      content: '';
-      background: #aaa;
-    }
-  }
 }
 </style>

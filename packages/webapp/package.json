@@ -18,6 +18,7 @@
     "vuetify": "^2.2.25"
   },
   "devDependencies": {
+    "@mdi/svg": "^5.1.45",
     "@nuxt/typescript-build": "^0.6.6",
     "@nuxtjs/vuetify": "^1.11.2",
     "@types/uuid": "^7.0.3",

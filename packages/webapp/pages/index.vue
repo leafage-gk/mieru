@@ -25,7 +25,7 @@
       </v-row>
       <v-row justify="center" align="stretch" no-gutters style="flex: 1;">
         <v-col>
-          <grid-group :item="root" />
+          <grid-tree :item="root" />
         </v-col>
       </v-row>
     </v-container>
@@ -39,7 +39,7 @@ import { injectWithE, storeKey } from '~/hooks';
 
 export default defineComponent({
   components: {
-    GridGroup: () => import('~/components/organisms/GridGroup.vue'),
+    GridTree: () => import('~/components/organisms/GridTree.vue'),
   },
   setup() {
     const state = reactive({

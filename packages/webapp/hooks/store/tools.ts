@@ -1,28 +1,23 @@
-import {
-  mdiArrowCollapse,
-  mdiBoxCutter,
-  mdiEraser,
-  mdiFormatColorFill,
-} from '@mdi/js';
+import { mdiBoxCutter, mdiEraser, mdiFormatColorFill } from '@mdi/js';
 import { computed, reactive, toRefs } from '@vue/composition-api';
 
 const useTools = () => {
-  const toolSymbols = ['cutter', 'collapse', 'eraser', 'fill-color'] as const;
+  const toolSymbols = ['cutter', 'eraser', 'fill-color'] as const;
 
   const localState = reactive({
     color: '#FF0000',
   });
 
   const state = reactive({
-    tool: 0,
-    type: toolSymbols[0] as typeof toolSymbols[number],
+    tool: 0 as number | undefined,
+    type: toolSymbols[0] as typeof toolSymbols[number] | undefined,
   });
 
-  const tools = [mdiBoxCutter, mdiArrowCollapse, mdiEraser, mdiFormatColorFill];
+  const tools = [mdiBoxCutter, mdiEraser, mdiFormatColorFill];
 
-  const selectTool = (tool: number) => {
+  const selectTool = (tool: number | undefined) => {
     state.tool = tool;
-    state.type = toolSymbols[tool];
+    state.type = tool === undefined ? undefined : toolSymbols[tool];
   };
 
   const color = computed({
