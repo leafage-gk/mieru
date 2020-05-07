@@ -8,24 +8,11 @@
         class="px-3"
         style="flex: 0;"
       >
-        <v-toolbar dense flat>
-          <v-spacer />
-          <v-btn-toggle dense :value="tool" @change="selectTool">
-            <v-btn small v-for="(icon, index) in tools" :key="index">
-              <v-icon>{{ icon }}</v-icon>
-            </v-btn>
-          </v-btn-toggle>
-          <v-menu v-model="palette" offset-y>
-            <template v-slot:activator="{ on }">
-              <v-chip class="ma-2" small :color="color" v-on="on" />
-            </template>
-            <v-color-picker v-model="color"></v-color-picker>
-          </v-menu>
-        </v-toolbar>
+        <toolbar-dashboard v-model="toolVal" />
       </v-row>
       <v-row justify="center" align="stretch" no-gutters style="flex: 1;">
         <v-col>
-          <grid-tree :item="root" />
+          <dock-panel :item="root" />
         </v-col>
       </v-row>
     </v-container>
@@ -33,29 +20,25 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, reactive, toRefs } from '@vue/composition-api';
+import { defineComponent } from '@vue/composition-api';
 
 import { injectWithE, storeKey } from '~/hooks';
 
 export default defineComponent({
   components: {
-    GridTree: () => import('~/components/organisms/GridTree.vue'),
+    ToolbarDashboard: () =>
+      import('~/components/molecules/ToolbarDashboard.vue'),
+    DockPanel: () => import('~/components/organisms/DockPanel.vue'),
   },
   setup() {
-    const state = reactive({
-      palette: false,
-    });
     const {
       dashboard: { root },
-      tools: { tool, tools, selectTool, color },
+      tools: { toolVal },
     } = injectWithE(storeKey);
+
     return {
       root,
-      tool,
-      tools,
-      selectTool,
-      color,
-      ...toRefs(state),
+      toolVal,
     };
   },
 });

@@ -25,6 +25,17 @@
 import { defineComponent, Ref, ref } from '@vue/composition-api';
 import { useEvent } from 'vue-composable';
 
+const throttle = function (fn: Function, interval: number) {
+  let lastTime = Date.now() - interval;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return (...args: any[]) => {
+    if (lastTime + interval < Date.now()) {
+      lastTime = Date.now();
+      fn(...args);
+    }
+  };
+};
+
 export default defineComponent({
   props: {
     vertical: {
@@ -32,27 +43,39 @@ export default defineComponent({
       default: false,
     },
   },
-  setup(_, ctx) {
+  setup(props, ctx) {
     const elref = ref(null) as Ref<Element | undefined>;
     const appear = ref(false);
+    const adjust = ref(false);
     useEvent(elref, 'mouseover', () => {
       appear.value = true;
     });
     useEvent(elref, 'mouseout', () => {
-      appear.value = false;
+      if (!adjust.value) {
+        appear.value = false;
+      }
     });
     useEvent(elref, 'mousedown', (e) => {
       let x = e.clientX;
       let y = e.clientY;
-      const onMouseMove = (e: MouseEvent) => {
+      const onMouseMove = throttle((e: MouseEvent) => {
         const diffX = e.clientX - x;
         const diffY = e.clientY - y;
         x = e.clientX;
         y = e.clientY;
         ctx.emit('movex', diffX);
         ctx.emit('movey', diffY);
-      };
+      }, 20);
+      adjust.value = true;
+      appear.value = true;
+      const pointerClass = `adjust-pointer__${
+        props.vertical ? 'vertical' : 'horizontal'
+      }`;
+      document.body.classList.add(pointerClass);
       const onMouseUp = () => {
+        adjust.value = false;
+        appear.value = false;
+        document.body.classList.remove(pointerClass);
         document.removeEventListener('mousemove', onMouseMove);
         document.removeEventListener('mouseup', onMouseUp);
       };
@@ -66,6 +89,15 @@ export default defineComponent({
   },
 });
 </script>
+
+<style lang="scss">
+.adjust-pointer__horizontal {
+  cursor: url('~@mdi/svg/svg/arrow-collapse-vertical.svg') 12 12, auto;
+}
+.adjust-pointer__vertical {
+  cursor: url('~@mdi/svg/svg/arrow-collapse-horizontal.svg') 12 12, auto;
+}
+</style>
 
 <style lang="scss" scoped>
 .dock-adjust {

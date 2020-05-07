@@ -1,20 +1,11 @@
-import { reactive, toRefs } from '@vue/composition-api';
+import { useDashboardTools } from '~/hooks/dashboard-tools';
 
 import useDashboard from './dashboard';
-import useTools from './tools';
 
 const useStore = () => {
   const dashboard = useDashboard();
-  const tools = useTools();
-  const state = reactive({
-    isRootMounted: false,
-  });
-  const setRootMounted = () => {
-    state.isRootMounted = true;
-  };
+  const tools = useDashboardTools();
   return {
-    ...toRefs(state),
-    setRootMounted,
     dashboard,
     tools,
   };

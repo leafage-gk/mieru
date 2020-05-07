@@ -1,4 +1,4 @@
-import { onMounted, provide } from '@vue/composition-api';
+import { provide } from '@vue/composition-api';
 
 import constData from '~/config/const';
 
@@ -11,10 +11,6 @@ const build = () => {
 
   const store = useStore();
   provide(storeKey, store);
-
-  onMounted(() => {
-    store.setRootMounted();
-  });
 
   return {
     settings: {

@@ -1,21 +1,21 @@
 import { ref } from '@vue/composition-api';
 import * as _uuid from 'uuid';
 
-export interface PanelItem {
+export interface DockItem {
   uuid: string;
-  type: 'panel';
+  type: 'dock';
   background?: string;
   flex?: number;
 }
 
-interface ContainerItem {
+export interface ContainerItem {
   uuid: string;
   type: 'container';
   rows: RowItem[];
   flex?: number;
 }
 
-export type ColItem = PanelItem | ContainerItem;
+export type ColItem = DockItem | ContainerItem;
 
 export interface RowItem {
   type: 'row';
@@ -34,11 +34,11 @@ interface ContainerItemRaw {
   flex?: number;
 }
 
-type ItemRaw = ContainerItemRaw | PanelItem;
+type ItemRaw = ContainerItemRaw | DockItem;
 
 const mock = () => {
   const rootId = _uuid.v4();
-  const panelId = _uuid.v4();
+  const dockId = _uuid.v4();
   return {
     rootId,
     items: [
@@ -48,13 +48,13 @@ const mock = () => {
         rows: [
           {
             type: 'row',
-            cols: [panelId],
+            cols: [dockId],
           },
         ],
       },
       {
-        uuid: panelId,
-        type: 'panel',
+        uuid: dockId,
+        type: 'dock',
       },
     ] as ItemRaw[],
   };
@@ -67,11 +67,11 @@ const useDashboard = () => {
   const getContainer = (id: string): ColItem => {
     const item = items.get(id);
     if (!item) {
-      const newItem: PanelItem = { uuid: _uuid.v4(), type: 'panel' };
+      const newItem: DockItem = { uuid: _uuid.v4(), type: 'dock' };
       items.set(newItem.uuid, newItem);
       return newItem;
     }
-    if (item.type === 'panel') {
+    if (item.type === 'dock') {
       return item;
     }
     return {
@@ -89,13 +89,13 @@ const useDashboard = () => {
     const itemOne = {
       ...items.get(uuid),
       uuid: _uuid.v4(),
-      type: 'panel',
+      type: 'dock',
       flex: undefined,
-    } as PanelItem;
+    } as DockItem;
     const itemTwo = {
       uuid: _uuid.v4(),
-      type: 'panel',
-    } as PanelItem;
+      type: 'dock',
+    } as DockItem;
     items.set(itemOne.uuid, itemOne);
     items.set(itemTwo.uuid, itemTwo);
     return [itemOne, itemTwo] as const;
@@ -135,7 +135,7 @@ const useDashboard = () => {
   };
   const rowSlider = (uuid: string, add: number) => {
     const item = items.get(uuid);
-    if (!item || item.type === 'panel') {
+    if (!item || item.type === 'dock') {
       return;
     }
     const flex = (item.rows[0].flex || 6) + add;
@@ -157,7 +157,7 @@ const useDashboard = () => {
   };
   const colSlider = (uuid: string, add: number) => {
     const item = items.get(uuid);
-    if (!item || item.type === 'panel') {
+    if (!item || item.type === 'dock') {
       return;
     }
     const [col1, col2] = item.rows[0].cols.map((ci) => items.get(ci));
@@ -176,16 +176,16 @@ const useDashboard = () => {
     }
     root.value = getContainer(raw.rootId);
   };
-  const setPanel = (uuid: string, panel: PanelItem) => {
-    const oldPanel = items.get(uuid);
-    if (oldPanel && oldPanel.type === 'panel') {
-      items.set(uuid, panel);
+  const setDock = (uuid: string, dock: DockItem) => {
+    const oldDock = items.get(uuid);
+    if (oldDock && oldDock.type === 'dock') {
+      items.set(uuid, dock);
       root.value = getContainer(raw.rootId);
     }
   };
-  const removePanel = (uuid: string, ri: number, ci: number) => {
+  const removeDock = (uuid: string, ri: number, ci: number) => {
     const item = items.get(uuid);
-    if (!item || item.type === 'panel') {
+    if (!item || item.type === 'dock') {
       return;
     }
     if (uuid === raw.rootId) {
@@ -197,11 +197,11 @@ const useDashboard = () => {
       item.rows.splice(ri, 1);
     }
     if (item.rows.length === 1 && item.rows[0].cols.length === 1) {
-      const panel = items.get(item.rows[0].cols[0]);
-      if (panel) {
-        items.delete(panel.uuid);
+      const dock = items.get(item.rows[0].cols[0]);
+      if (dock) {
+        items.delete(dock.uuid);
         items.set(uuid, {
-          ...panel,
+          ...dock,
           uuid,
           flex: item.flex,
         } as ItemRaw);
@@ -215,8 +215,8 @@ const useDashboard = () => {
     divideCol,
     rowSlider,
     colSlider,
-    setPanel,
-    removePanel,
+    setDock,
+    removeDock,
   };
 };
 
