@@ -1,0 +1,13 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "~/*": ["./src/*"],
+      "~/test/*": ["./test/*"]
+    },
+    "typeRoots": ["../../node_modules/@types"]
+  },
+  "include": ["src", "test"],
+  "exclude": ["**/node_modules/*", "lib", "coverage"]
+}

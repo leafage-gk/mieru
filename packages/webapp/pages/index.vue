@@ -8,11 +8,11 @@
         class="px-3"
         style="flex: 0;"
       >
-        <toolbar-dashboard v-model="toolVal" />
+        <toolbar-dock v-model="toolVal" />
       </v-row>
       <v-row justify="center" align="stretch" no-gutters style="flex: 1;">
         <v-col>
-          <dock-panel :item="root" />
+          <dock-container :target="rootKey" />
         </v-col>
       </v-row>
     </v-container>
@@ -26,19 +26,15 @@ import { injectWithE, storeKey } from '~/hooks';
 
 export default defineComponent({
   components: {
-    ToolbarDashboard: () =>
-      import('~/components/molecules/ToolbarDashboard.vue'),
-    DockPanel: () => import('~/components/organisms/DockPanel.vue'),
+    ToolbarDock: () => import('~/components/molecules/ToolbarDock.vue'),
+    DockContainer: () => import('~/components/organisms/Dock/Container.vue'),
   },
   setup() {
-    const {
-      dashboard: { root },
-      tools: { toolVal },
-    } = injectWithE(storeKey);
+    const store = injectWithE(storeKey);
 
     return {
-      root,
-      toolVal,
+      rootKey: store.dock.repo.rootKey,
+      toolVal: store.dock.tools.toolVal,
     };
   },
 });

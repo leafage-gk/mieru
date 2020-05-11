@@ -1,6 +1,18 @@
 <template>
   <v-toolbar dense flat>
     <v-spacer />
+    <v-col cols="2" class="py-0">
+      <v-slider
+        v-model="space"
+        min="0"
+        max="10"
+        label="Space"
+        dense
+        hide-details
+        thumb-label
+        thumb-size="18"
+      />
+    </v-col>
     <v-btn-toggle dense v-model="selectedIndex">
       <v-btn small v-for="(icon, index) in toolIcons" :key="index">
         <v-icon>{{ icon }}</v-icon>
@@ -18,12 +30,12 @@
 <script lang="ts">
 import { computed, defineComponent, PropType, ref } from '@vue/composition-api';
 
-import { DashboardToolValue, toolIcons } from '~/hooks/dashboard-tools';
+import { DockToolValue, toolIcons } from '~/hooks/dock/tools';
 
 export default defineComponent({
   props: {
     value: {
-      type: Object as PropType<DashboardToolValue>,
+      type: Object as PropType<DockToolValue>,
       required: true,
     },
   },
@@ -45,11 +57,18 @@ export default defineComponent({
         ctx.emit('change', { ...props.value, color });
       },
     });
+    const space = computed({
+      get: () => props.value.space,
+      set: (space: number) => {
+        ctx.emit('change', { ...props.value, space });
+      },
+    });
     return {
       toolIcons,
       palette,
       selectedIndex,
       color,
+      space,
     };
   },
 });

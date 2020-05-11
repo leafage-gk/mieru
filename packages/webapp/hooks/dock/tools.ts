@@ -7,21 +7,23 @@ const toolSymbols = ['cutter', 'eraser', 'fill-color'] as const;
 
 export type ToolType = typeof toolSymbols[number];
 
-export interface DashboardToolValue {
+export interface DockToolValue {
   color: string;
+  space: number;
   selectedIndex?: number;
 }
 
-const getSelected = ({ selectedIndex }: DashboardToolValue) => {
+const getSelected = ({ selectedIndex }: DockToolValue) => {
   return selectedIndex !== undefined ? toolSymbols[selectedIndex] : undefined;
 };
 
-const defaultValue = (): DashboardToolValue => ({
+const defaultValue = (): DockToolValue => ({
   color: '#FF0000',
+  space: 4,
   selectedIndex: 0,
 });
 
-export const useDashboardTools = (init = defaultValue()) => {
+export const useDockTools = (init = defaultValue()) => {
   const state = reactive({
     val: { ...init },
     selected: getSelected(init),
@@ -37,11 +39,14 @@ export const useDashboardTools = (init = defaultValue()) => {
 
   const color = computed(() => state.val.color);
 
+  const space = computed(() => state.val.space);
+
   const selectedTool = computed(() => state.selected);
 
   return {
     toolVal,
     color,
+    space,
     selectedTool,
   };
 };

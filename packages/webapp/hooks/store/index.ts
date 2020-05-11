@@ -1,13 +1,14 @@
-import { useDashboardTools } from '~/hooks/dashboard-tools';
-
-import useDashboard from './dashboard';
+import { useDockRepo } from '../dock/repo';
+import { useDockTools } from '../dock/tools';
 
 const useStore = () => {
-  const dashboard = useDashboard();
-  const tools = useDashboardTools();
+  const repo = useDockRepo();
+  const tools = useDockTools();
   return {
-    dashboard,
-    tools,
+    dock: {
+      repo,
+      tools,
+    },
   };
 };
 
